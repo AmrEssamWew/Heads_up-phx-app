@@ -8,6 +8,7 @@ defmodule HeadsUpWeb.Router do
     plug(:put_root_layout, html: {HeadsUpWeb.Layouts, :root})
     plug(:protect_from_forgery)
     plug(:put_secure_browser_headers)
+    plug(:spy)
   end
 
   def spy(conn, _otp) do
@@ -17,7 +18,6 @@ defmodule HeadsUpWeb.Router do
 
     conn =
       assign(conn, :answer, answer)
-      |> IO.inspect()
 
     conn
   end
@@ -31,6 +31,7 @@ defmodule HeadsUpWeb.Router do
 
     get("/", PageController, :home)
     get("/tips", TipController, :index)
+    get("/tips/:id", TipController, :show)
   end
 
   # Other scopes may use custom stacks.

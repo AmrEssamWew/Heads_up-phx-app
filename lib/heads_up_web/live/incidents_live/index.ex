@@ -10,32 +10,16 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   def render(assigns) do
     ~H"""
     <div class="incident-index">
+      <HeadsUpWeb.CustomComponents.headline>
+        <.icon name="hero-trophy-mini" /> 25 Incidents Resolved This Month!
+        <:tagline :let={vibe}>
+          Thanks for pitching in. {vibe}
+        </:tagline>
+      </HeadsUpWeb.CustomComponents.headline>
+
       <div class="incidents">
-        <.incident_card :for={incident <- @incidents} incident={incident} />
+        <HeadsUpWeb.CustomComponents.incident_card :for={incident <- @incidents} incident={incident} />
       </div>
-    </div>
-    """
-  end
-
-  def incident_card(assigns) do
-    ~H"""
-    <div class="card">
-      <img src={@incident.image_path} />
-      <h2>{@incident.name}</h2>
-      <div class="details">
-        <.badge status={@incident.status} />
-        <div class="priority">
-          {@incident.priority}
-        </div>
-      </div>
-    </div>
-    """
-  end
-
-  def badge(assigns) do
-    ~H"""
-    <div class="rounded-md px-2 py-1 text-xs font-medium uppercase inline-block border text-lime-600 border-lime-600">
-      @status
     </div>
     """
   end

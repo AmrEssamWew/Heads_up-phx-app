@@ -4,7 +4,7 @@ defmodule HeadsUpWeb.CustomComponents do
   def incident_card(assigns) do
     ~H"""
     <div class="card">
-      <.link navigate={~p"/incidents/#{@incident.id}"}>
+      <.link navigate={~p"/incidents/#{@incident.id}"} id={@id}>
         <img src={@incident.image_path} />
         <h2>{@incident.name}</h2>
         <div class="details">

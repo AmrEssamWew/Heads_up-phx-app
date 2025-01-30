@@ -3,8 +3,17 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   alias HeadsUp.Incidents
 
   def mount(_params, _session, socket) do
-    socket = assign(socket, incidents: Incidents.list_incidents(), page_title: "Incidents")
-    {:ok, socket}
+    socket = stream(socket, :incidents, Incidents.list_incidents())
+
+    socket =
+      attach_hook(socket, :log_stream, :after_render, fn
+        socket ->
+          # inspect the stream
+          IO.inspect(socket, lable: "After_render")
+          socket
+      end)
+
+    {:ok, assign(socket, page_title: "Incidents")}
   end
 
   def render(assigns) do
@@ -17,8 +26,12 @@ defmodule HeadsUpWeb.IncidentLive.Index do
         </:tagline>
       </HeadsUpWeb.CustomComponents.headline>
 
-      <div class="incidents">
-        <HeadsUpWeb.CustomComponents.incident_card :for={incident <- @incidents} incident={incident} />
+      <div class="incidents" id="incidents" phx-update="stream">
+        <HeadsUpWeb.CustomComponents.incident_card
+          :for={{dom_id, incident} <- @streams.incidents}
+          incident={incident}
+          id={dom_id}
+        />
       </div>
     </div>
     """

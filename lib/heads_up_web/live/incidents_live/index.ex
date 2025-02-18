@@ -3,21 +3,16 @@ defmodule HeadsUpWeb.IncidentLive.Index do
   alias HeadsUp.Incidents
 
   def mount(_params, _session, socket) do
-    socket = stream(socket, :incidents, Incidents.list_incidents())
-
-    socket =
-      attach_hook(socket, :log_stream, :after_render, fn
-        socket ->
-          # inspect the stream
-          IO.inspect(socket, lable: "After_render")
-          socket
-      end)
-
     {:ok,
      assign(socket,
        page_title: "Incidents",
-       form: to_form(%{"q" => "", "status" => "", "priority" => ""})
+       form: to_form(%{})
      )}
+  end
+
+  def handle_params(params, _uri, socket) do
+    socket = stream(socket, :incidents, Incidents.filtered_incidents(params), reset: true)
+    {:noreply, socket}
   end
 
   def render(assigns) do
@@ -44,7 +39,7 @@ defmodule HeadsUpWeb.IncidentLive.Index do
 
   def filter_form(assigns) do
     ~H"""
-    <.form phx-change="wew" for={@form}>
+    <.form phx-change="filter" for={@form}>
       <.input field={@form[:q]} placeholder="Search..." autocomplete="off" />
       <.input
         type="select"
@@ -62,14 +57,13 @@ defmodule HeadsUpWeb.IncidentLive.Index do
     """
   end
 
-  def handle_event("wew", params, socket) do
-    new = Incidents.filtered_incidents(params)
-    IO.inspect(new)
+  def handle_event("filter", params, socket) do
+    params = params |> Map.take(~w(q priority status)) |> Map.reject(fn {_, v} -> v == "" end)
 
     socket =
       socket
       |> assign(:form, to_form(params))
-      |> stream(:incidents, new, reset: true)
+      |> push_patch(to: ~p"/incidents/?#{params}")
 
     {:noreply, socket}
   end

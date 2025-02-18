@@ -17,7 +17,6 @@ defmodule HeadsUp.Incidents do
       |> sort_by(filter["priority"])
       |> Repo.all()
 
-    IO.inspect(list)
     list
   end
 
